@@ -1,0 +1,49 @@
+
+.SILENT:
+
+
+FLAGS_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
+SELF_DIR   = $(dir $@)
+
+export RM = rm
+export CP = cp
+
+export AR1 := $(AR)
+export AS1 := $(AS)
+export CC1 := $(CC)
+export CXX1 := $(CXX)
+export LD1 := $(CC)
+
+export AR   = echo "  AR    $<" && $(AR1)
+export AS   = echo "  AS    $^" && $(AS1)
+export CC   = echo "  CC    $^" && $(CC1)
+export CXX  = echo "  CXX   $^" && $(CXX1)
+export LD   = echo "  LD    $@" && $(LD1)
+export FASM = echo "  FASM  $^" && fasm >/dev/null
+
+
+# halt&cache fire if windows
+ifneq (, $(findstring mingw,$(shell $(CC1) -dumpmachine)))
+export Platform_CXXFLAGS      := -DSFML_STATIC
+export Platform_LDFLAGS       :=
+export Platform_LDLIBS        := -lgdi32 -limm32 -lwinmm
+export Platform_INCLUDEFLAGS  :=
+else
+export Platform_CXXFLAGS      :=
+export Platform_LDFLAGS       :=
+export Platform_LDLIBS        := -lGL
+export Platform_INCLUDEFLAGS  :=
+endif
+
+export INCLUDEFLAGS := $(Platform_INCLUDEFLAGS)
+
+export CPPFLAGS = -DIMGUI_USER_CONFIG=\"../imgui-sfml/imconfig-SFML.h\"
+export CFLAGS   = $(INCLUDEFLAGS) $(BUILD_OPTIONS) -O2 -Wno-attributes
+export CXXFLAGS = $(INCLUDEFLAGS) -DHELOS $(BUILD_OPTIONS) $(Platform_CXXFLAGS) -O2 -Wno-unused-result -std=c++17
+export LDFLAGS  = $(Platform_LDFLAGS) -s -O2
+export LDLIBS   = $(Platform_LDLIBS) -lsfml-graphics -lsfml-window -lsfml-system -lm -lstdc++
+
+# Pattern rule for FASM assembly
+%.o: %.S
+	$(FASM) $^ $@
+

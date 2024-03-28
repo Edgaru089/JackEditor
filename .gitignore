@@ -1,0 +1,6 @@
+jack_editor
+jack_editor.exe
+*.o
+*.dll
+imgui.ini
+*.swp
