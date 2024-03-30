@@ -38,9 +38,9 @@ endif
 export INCLUDEFLAGS := $(Platform_INCLUDEFLAGS)
 
 export CPPFLAGS = -DIMGUI_USER_CONFIG=\"../imgui-sfml/imconfig-SFML.h\"
-export CFLAGS   = $(INCLUDEFLAGS) $(BUILD_OPTIONS) -O2 -Wno-attributes
-export CXXFLAGS = $(INCLUDEFLAGS) -DHELOS $(BUILD_OPTIONS) $(Platform_CXXFLAGS) -O2 -Wno-unused-result -std=c++17
-export LDFLAGS  = $(Platform_LDFLAGS) -s -O2
+export CFLAGS   = $(INCLUDEFLAGS) $(BUILD_OPTIONS) -Wno-attributes -g
+export CXXFLAGS = $(INCLUDEFLAGS) -DHELOS $(BUILD_OPTIONS) $(Platform_CXXFLAGS) -Wno-unused-result -std=c++17 -g
+export LDFLAGS  = $(Platform_LDFLAGS) -g
 export LDLIBS   = $(Platform_LDLIBS) -lsfml-graphics -lsfml-window -lsfml-system -lm -lstdc++
 
 # Pattern rule for FASM assembly
