@@ -20,6 +20,9 @@ std::map<render_PrimitiveType, std::string> primitive_name_upper = {
 	{render_Polygon, "POLY"},
 };
 
+
+char buf[1024];
+
 std::string toString(render_Bundle &b) {
 #define APPEND_FMT(...)                          \
 	do {                                         \
@@ -30,7 +33,6 @@ std::string toString(render_Bundle &b) {
 #define EXPAND_RGBA(packed) ((packed >> IM_COL32_R_SHIFT) & 0xff), ((packed >> IM_COL32_G_SHIFT) & 0xff), ((packed >> IM_COL32_B_SHIFT) & 0xff)
 
 	std::string str;
-	static char buf[1024];
 
 	APPEND_FMT("BUNDLE %s\n", b.name.c_str());
 	for (auto &p: b.prims) {
