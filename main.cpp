@@ -21,7 +21,7 @@ void ui_map();
 
 
 int main(int argc, char *argv[]) {
-	UI ui(sf::Vector2u(1200, 1000), "JackEditor");
+	UI ui(sf::Vector2u(1400, 1000), "JackEditor");
 
 	while (ui.Update()) {
 		static bool demo_open = false;
@@ -37,8 +37,16 @@ int main(int argc, char *argv[]) {
 
 		if (demo_open)
 			ig::ShowDemoWindow(&demo_open);
-		if (bundleOpen)
+		if (bundleOpen) {
+			ig::PushID(1);
 			ui_bundle();
+			ig::PopID();
+		}
+		if (mapOpen) {
+			ig::PushID(2);
+			ui_map();
+			ig::PopID();
+		}
 
 
 		ui.Render();

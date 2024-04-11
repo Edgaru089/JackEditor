@@ -43,6 +43,9 @@ public:
 	Vec2 operator+(Vec2 other) const {
 		return Vec2(x + other.x, y + other.y);
 	}
+	Vec2 operator-(Vec2 other) const {
+		return Vec2(x - other.x, y - other.y);
+	}
 	Vec2 operator*(double other) const {
 		return Vec2(x * other, y * other);
 	}
