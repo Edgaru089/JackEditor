@@ -56,6 +56,8 @@ void ui_map() {
 					e = new Textbox();
 					CMD("LEVEL_TRANSITION")
 					e = new LevelTransition();
+					CMD("CAMERA_FOCUS")
+					e = new CameraFocus();
 					CMD("CUTOFF")
 					cutoff = strtod(strtok(NULL, " "), NULL);
 
@@ -72,22 +74,38 @@ void ui_map() {
 
 		Vec2 center = Vec2(ig::GetIO().DisplaySize) * 0.5 - offset;
 		ig::SeparatorText("Add Entity");
-		if (ig::Button("Hitbox"))
+		if (ig::Button("Hitbox")) {
 			entities.push_back((new Hitbox())->setpos(center));
+			selected_entity = entities.back();
+		}
 		ig::SameLine();
-		if (ig::Button("Player"))
+		if (ig::Button("Player")) {
 			entities.push_back((new Player())->setpos(center));
+			selected_entity = entities.back();
+		}
 		ig::SameLine();
-		if (ig::Button("Hazard Respawn"))
+		if (ig::Button("Hazard Respawn")) {
 			entities.push_back((new HazardRespawn())->setpos(center));
-		if (ig::Button("Hazard"))
+			selected_entity = entities.back();
+		}
+		if (ig::Button("Hazard")) {
 			entities.push_back((new Hazard())->setpos(center));
+			selected_entity = entities.back();
+		}
 		ig::SameLine();
-		if (ig::Button("Textbox"))
+		if (ig::Button("Textbox")) {
 			entities.push_back((new Textbox())->setpos(center));
+			selected_entity = entities.back();
+		}
 		ig::SameLine();
-		if (ig::Button("Level Transition"))
+		if (ig::Button("Level Transition")) {
 			entities.push_back((new LevelTransition())->setpos(center));
+			selected_entity = entities.back();
+		}
+		if (ig::Button("Camera Focus")) {
+			entities.push_back((new CameraFocus())->setpos(center));
+			selected_entity = entities.back();
+		}
 
 		DragDouble("Cutoff depth", &cutoff);
 

@@ -285,3 +285,30 @@ public:
 	Box2        box;
 	std::string next_level;
 };
+
+
+class CameraFocus: public EntityBase {
+public:
+	std::string type() override { return "camera_focus"; }
+	std::string to_file() override {
+		snprintf(buf, sizeof(buf), "CAMERA_FOCUS %.0lf %.0lf %.0lf %.0lf\n", box.lefttop.x, box.lefttop.y, box.size.x, box.size.y);
+		return buf;
+	}
+	void from_strtok() override {
+		double a, b, c, d;
+		a   = TOKEN_DOUBLE;
+		b   = TOKEN_DOUBLE;
+		c   = TOKEN_DOUBLE;
+		d   = TOKEN_DOUBLE;
+		box = Box2(a, b, c, d);
+	}
+
+	void        imgui() override { DragBox2("", &box); }
+	void        draw(Vec2 offset, bool selected) override { draw_box2(box.offset(offset), selected, IM_COL32(0, 255, 255, 255)); }
+	EntityBase *setpos(Vec2 pos) override {
+		box.lefttop = pos;
+		return this;
+	}
+
+	Box2 box;
+};
