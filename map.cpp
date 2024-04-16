@@ -15,7 +15,8 @@ static std::list<EntityBase *> entities;
 static EntityBase             *selected_entity = NULL;
 static EntityBase             *to_delete       = NULL;
 static Vec2                    offset0(0, 0);
-static double                  cutoff = 1500;
+static double                  cutoff     = 1500;
+static float                   bgcolor[3] = {0.0f, 0.0f, 0.0f};
 
 
 void ui_map() {
@@ -32,6 +33,7 @@ void ui_map() {
 				for (EntityBase *e: entities)
 					delete e;
 				entities.clear();
+				selected_entity = NULL;
 
 				std::istringstream is(buf_code);
 				std::string        line;
@@ -58,8 +60,15 @@ void ui_map() {
 					e = new LevelTransition();
 					CMD("CAMERA_FOCUS")
 					e = new CameraFocus();
+					CMD("FILL_BOX")
+					e = new FillBox;
 					CMD("CUTOFF")
 					cutoff = strtod(strtok(NULL, " "), NULL);
+					CMD("BACKGROUND") {
+						bgcolor[0] = strtof(TOKEN, NULL) / 255.0f;
+						bgcolor[1] = strtof(TOKEN, NULL) / 255.0f;
+						bgcolor[2] = strtof(TOKEN, NULL) / 255.0f;
+					}
 
 					if (e != NULL) {
 						e->from_strtok();
@@ -106,8 +115,14 @@ void ui_map() {
 			entities.push_back((new CameraFocus())->setpos(center));
 			selected_entity = entities.back();
 		}
+		ig::SameLine();
+		if (ig::Button("Fill Box")) {
+			entities.push_back((new FillBox())->setpos(center));
+			selected_entity = entities.back();
+		}
 
 		DragDouble("Cutoff depth", &cutoff);
+		ImGui::ColorEdit3("Background", bgcolor, ImGuiColorEditFlags_PickerHueWheel);
 
 		ig::SeparatorText("Entities");
 		if (ig::Selectable("<<< CLEAR >>>", selected_entity == NULL))
@@ -126,6 +141,10 @@ void ui_map() {
 	}
 	ig::End();
 
+	ImVec2      screen_size = ig::GetIO().DisplaySize;
+	ImDrawList *drawlist    = ig::GetBackgroundDrawList();
+	drawlist->AddRectFilled(ImVec2(0, 0), screen_size, ImGui::ColorConvertFloat4ToU32(ImVec4(bgcolor[0], bgcolor[1], bgcolor[2], 1.0f)));
+
 	if (ig::Begin("Properities") && selected_entity != NULL) {
 		ig::PushID(selected_entity);
 		selected_entity->imgui();
@@ -133,12 +152,12 @@ void ui_map() {
 	}
 	ig::End();
 
-	ImVec2      screen_size = ig::GetIO().DisplaySize;
-	ImDrawList *drawlist    = ig::GetBackgroundDrawList();
 	drawlist->AddLine(ImVec2(0, offset.y), ImVec2(screen_size.x, offset.y), IM_COL32_WHITE);
 	drawlist->AddLine(ImVec2(offset.x, 0), ImVec2(offset.x, screen_size.y), IM_COL32_WHITE);
 	drawlist->AddLine(ImVec2(0, cutoff + offset.y), ImVec2(screen_size.x, cutoff + offset.y), IM_COL32(255, 0, 0, 255));
 	// Draw every entity
+	for (EntityBase *e: entities)
+		e->draw_prev(offset, e == selected_entity);
 	for (EntityBase *e: entities)
 		e->draw(offset, e == selected_entity);
 
@@ -146,6 +165,7 @@ void ui_map() {
 	static std::string buff;
 	buff.clear();
 	buff = "CUTOFF " + std::to_string((int)std::round(cutoff)) + "\n";
+	buff += "BACKGROUND " + std::to_string((int)std::round(bgcolor[0] * 255.0f)) + " " + std::to_string((int)std::round(bgcolor[1] * 255.0f)) + " " + std::to_string((int)std::round(bgcolor[2] * 255.0f)) + "\n";
 	for (EntityBase *e: entities) {
 		buff += e->to_file();
 	}

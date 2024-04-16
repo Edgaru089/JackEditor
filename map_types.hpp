@@ -19,6 +19,7 @@ public:
 
 	// Pointer to the entity base is pushed outside
 	virtual void        imgui() {}
+	virtual void        draw_prev(Vec2 offset, bool selected) {}
 	virtual void        draw(Vec2 offset, bool selected) {}
 	virtual EntityBase *setpos(Vec2 pos) { return this; }
 };
@@ -311,4 +312,41 @@ public:
 	}
 
 	Box2 box;
+};
+
+class FillBox: public EntityBase {
+public:
+	std::string type() override { return "fill_box"; }
+	std::string to_file() override {
+		snprintf(buf, sizeof(buf), "FILL_BOX %.0f %.0f %.0f %.0lf %.0lf %.0lf %.0lf\n", color[0] * 255, color[1] * 255, color[2] * 255, box.lefttop.x, box.lefttop.y, box.size.x, box.size.y);
+		return buf;
+	}
+	void from_strtok() override {
+		color[0] = TOKEN_DOUBLE / 255.0;
+		color[1] = TOKEN_DOUBLE / 255.0;
+		color[2] = TOKEN_DOUBLE / 255.0;
+		double a, b, c, d;
+		a   = TOKEN_DOUBLE;
+		b   = TOKEN_DOUBLE;
+		c   = TOKEN_DOUBLE;
+		d   = TOKEN_DOUBLE;
+		box = Box2(a, b, c, d);
+	}
+
+	void imgui() override {
+		ig::ColorEdit3("Fill", color, ImGuiColorEditFlags_PickerHueWheel);
+		DragBox2("", &box);
+	}
+	void draw_prev(Vec2 offset, bool selected) override {
+		ImDrawList *d     = ig::GetBackgroundDrawList();
+		Box2        world = box.offset(offset);
+		d->AddRectFilled(world.lefttop.im(), (world.lefttop + world.size).im(), ImColor(color[0], color[1], color[2]));
+	}
+	EntityBase *setpos(Vec2 pos) override {
+		box.lefttop = pos;
+		return this;
+	}
+
+	Box2  box;
+	float color[3];
 };
