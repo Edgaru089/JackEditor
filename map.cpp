@@ -60,7 +60,7 @@ void ui_map() {
 					e = new LevelTransition();
 					CMD("CAMERA_FOCUS")
 					e = new CameraFocus();
-					CMD("FILL_BOX")
+					CMD("FILL")
 					e = new FillBox;
 					CMD("CUTOFF")
 					cutoff = strtod(strtok(NULL, " "), NULL);

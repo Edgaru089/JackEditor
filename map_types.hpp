@@ -316,9 +316,9 @@ public:
 
 class FillBox: public EntityBase {
 public:
-	std::string type() override { return "fill_box"; }
+	std::string type() override { return "fill"; }
 	std::string to_file() override {
-		snprintf(buf, sizeof(buf), "FILL_BOX %.0f %.0f %.0f %.0lf %.0lf %.0lf %.0lf\n", color[0] * 255, color[1] * 255, color[2] * 255, box.lefttop.x, box.lefttop.y, box.size.x, box.size.y);
+		snprintf(buf, sizeof(buf), "FILL %.0f %.0f %.0f %.0lf %.0lf %.0lf %.0lf\n", color[0] * 255, color[1] * 255, color[2] * 255, box.lefttop.x, box.lefttop.y, box.size.x, box.size.y);
 		return buf;
 	}
 	void from_strtok() override {
