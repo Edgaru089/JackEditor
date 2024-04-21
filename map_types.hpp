@@ -7,6 +7,7 @@
 #include <cstring>
 #include <iterator>
 #include <string>
+#include <vector>
 
 
 class EntityBase {
@@ -349,4 +350,68 @@ public:
 
 	Box2  box;
 	float color[3];
+};
+
+class FillPoly: public EntityBase {
+public:
+	std::string type() override { return "fillpoly"; }
+	std::string to_file() override {
+		std::string ans;
+		snprintf(buf, sizeof(buf), "FILLPOLY %.0f %.0f %.0f %d", color[0] * 255, color[1] * 255, color[2] * 255, (int)points.size());
+		ans += buf;
+
+		for (const Vec2 &p: points) {
+			snprintf(buf, sizeof(buf), " %.0lf %.0lf", p.x, p.y);
+			ans += buf;
+		}
+
+		ans += "\n";
+		return ans;
+	}
+	void from_strtok() override {
+		color[0] = TOKEN_DOUBLE / 255.0;
+		color[1] = TOKEN_DOUBLE / 255.0;
+		color[2] = TOKEN_DOUBLE / 255.0;
+		int n    = TOKEN_INT;
+		points.resize(n);
+		for (int i = 0; i < n; i++) {
+			double x  = TOKEN_DOUBLE;
+			double y  = TOKEN_DOUBLE;
+			points[i] = Vec2(x, y);
+		}
+	}
+
+	void imgui() override {
+		ig::ColorEdit3("Fill", color, ImGuiColorEditFlags_PickerHueWheel);
+		ig::SameLine();
+		if (ig::Button("Add Point")) {
+			if (points.empty())
+				points.push_back(pos0);
+			else
+				points.push_back(points.back());
+		}
+		for (int i = 0; i < points.size(); i++) {
+			ig::PushID(i);
+			DragVec2("", &points[i]);
+			ig::PopID();
+		}
+	}
+	void draw_prev(Vec2 offset, bool selected) override {
+		if (points.size() < 3)
+			return;
+		ImDrawList                *d = ig::GetBackgroundDrawList();
+		static std::vector<ImVec2> screen;
+		screen.clear();
+		for (const Vec2 &p: points)
+			screen.push_back((p + offset).im());
+		d->AddConvexPolyFilled(screen.data(), screen.size(), ImColor(color[0], color[1], color[2]));
+	}
+	EntityBase *setpos(Vec2 pos) override {
+		pos0 = pos;
+		return this;
+	}
+
+	std::vector<Vec2> points;
+	float             color[3];
+	Vec2              pos0;
 };

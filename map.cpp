@@ -62,6 +62,8 @@ void ui_map() {
 					e = new CameraFocus();
 					CMD("FILL")
 					e = new FillBox;
+					CMD("FILLPOLY")
+					e = new FillPoly;
 					CMD("CUTOFF")
 					cutoff = strtod(strtok(NULL, " "), NULL);
 					CMD("BACKGROUND") {
@@ -118,6 +120,11 @@ void ui_map() {
 		ig::SameLine();
 		if (ig::Button("Fill Box")) {
 			entities.push_back((new FillBox())->setpos(center));
+			selected_entity = entities.back();
+		}
+		ig::SameLine();
+		if (ig::Button("Fill Poly")) {
+			entities.push_back((new FillPoly())->setpos(center));
 			selected_entity = entities.back();
 		}
 
