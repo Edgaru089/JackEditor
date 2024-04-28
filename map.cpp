@@ -15,6 +15,8 @@ static std::list<EntityBase *> entities;
 static EntityBase             *selected_entity = NULL;
 static EntityBase             *to_delete       = NULL;
 static Vec2                    offset0(0, 0);
+static Vec2                    put_camera(0, 0);
+static bool                    has_put_camera = true;
 static double                  cutoff     = 1500;
 static float                   bgcolor[3] = {0.0f, 0.0f, 0.0f};
 
@@ -70,6 +72,11 @@ void ui_map() {
 						bgcolor[0] = strtof(TOKEN, NULL) / 255.0f;
 						bgcolor[1] = strtof(TOKEN, NULL) / 255.0f;
 						bgcolor[2] = strtof(TOKEN, NULL) / 255.0f;
+					}
+					CMD("PUT_CAMERA") {
+						has_put_camera = true;
+						put_camera.x = strtod(strtok(NULL, " "), NULL);
+						put_camera.y = strtod(strtok(NULL, " "), NULL);
 					}
 
 					if (e != NULL) {
@@ -130,6 +137,8 @@ void ui_map() {
 
 		DragDouble("Cutoff depth", &cutoff);
 		ImGui::ColorEdit3("Background", bgcolor, ImGuiColorEditFlags_PickerHueWheel);
+		DragVec2("Put Camera", &put_camera);
+		//ig::SameLine();dd
 
 		ig::SeparatorText("Entities");
 		if (ig::Selectable("<<< CLEAR >>>", selected_entity == NULL))
@@ -173,6 +182,8 @@ void ui_map() {
 	buff.clear();
 	buff = "CUTOFF " + std::to_string((int)std::round(cutoff)) + "\n";
 	buff += "BACKGROUND " + std::to_string((int)std::round(bgcolor[0] * 255.0f)) + " " + std::to_string((int)std::round(bgcolor[1] * 255.0f)) + " " + std::to_string((int)std::round(bgcolor[2] * 255.0f)) + "\n";
+	if (has_put_camera)
+		buff += "PUT_CAMERA " + std::to_string((int)std::round(put_camera.x)) + " " + std::to_string((int)std::round(put_camera.y)) + "\n";
 	for (EntityBase *e: entities) {
 		buff += e->to_file();
 	}

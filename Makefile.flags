@@ -26,7 +26,7 @@ export FASM = echo "  FASM  $^" && fasm >/dev/null
 ifneq (, $(findstring mingw,$(shell $(CC1) -dumpmachine)))
 export Platform_CXXFLAGS      := -DSFML_STATIC
 export Platform_LDFLAGS       :=
-export Platform_LDLIBS        := -lgdi32 -limm32 -lwinmm
+export Platform_LDLIBS        := -lopengl32 -lgdi32 -limm32 -lwinmm
 export Platform_INCLUDEFLAGS  :=
 else
 export Platform_CXXFLAGS      :=
